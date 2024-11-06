@@ -1,4 +1,5 @@
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -7,17 +8,60 @@ import {
   View,
 } from "react-native";
 import TaskCard from "./src/components/taskCard";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface Data {
-  id: number;
+  id: string;
   name: string;
   description: string;
 }
 export default function App() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [data, setData] = useState<Data[] | []>([]);
+  const [data, setData] = useState<Data[]>([]);
+
+  const secondInputRef = useRef<TextInput>(null);
+  const onSubmitEditingFirstInput = () => {
+    if (secondInputRef.current) {
+      secondInputRef.current.focus();
+    }
+  };
+
+  const resetStates = () => {
+    setName("");
+    setDescription("");
+  };
+
+  const addItem = () => {
+    if (!data.length) {
+      if (!name.length || !description.length) {
+        Alert.alert("Ошибка", "Вы ввели не все данные");
+      } else {
+        setData([
+          {
+            id: Math.random().toString(),
+            name: name,
+            description: description,
+          },
+        ]);
+        resetStates();
+      }
+    } else {
+      if (!name.length || !description.length) {
+        Alert.alert("Ошибка", "Вы ввели не все данные");
+      } else {
+        setData((prev) => [
+          ...prev,
+          {
+            id: Math.random().toString(),
+            name: name,
+            description: description,
+          },
+        ]);
+        resetStates();
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -26,6 +70,7 @@ export default function App() {
           <View style={styles.leftBlockFormItem}>
             <Text>Name:</Text>
             <TextInput
+              onSubmitEditing={onSubmitEditingFirstInput}
               style={styles.input}
               value={name}
               onChangeText={(value) => setName(value)}
@@ -34,28 +79,14 @@ export default function App() {
           <View style={styles.leftBlockFormItem}>
             <Text>Descr:</Text>
             <TextInput
+              ref={secondInputRef}
               style={styles.input}
               value={description}
               onChangeText={(value) => setDescription(value)}
             />
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            if (!data.length) {
-              setData([{ id: 1, name: name, description: description }]);
-            } else {
-              setData((prev) => [
-                ...prev,
-                {
-                  id: prev[prev.length - 1].id + 1,
-                  name: name,
-                  description: description,
-                },
-              ]);
-            }
-          }}
-        >
+        <TouchableOpacity onPress={addItem}>
           <Text style={styles.button}>Add</Text>
         </TouchableOpacity>
       </View>
