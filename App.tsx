@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import TaskCard from "./src/components/taskCard";
 import { useRef, useState } from "react";
+import Input from "./src/components/input";
 
 interface Data {
   id: string;
@@ -34,7 +35,7 @@ export default function App() {
 
   const addItem = () => {
     if (!data.length) {
-      if (!name.length || !description.length) {
+      if (!name.trim().length || !description.trim().length) {
         Alert.alert("Ошибка", "Вы ввели не все данные");
       } else {
         setData([
@@ -47,7 +48,7 @@ export default function App() {
         resetStates();
       }
     } else {
-      if (!name.length || !description.length) {
+      if (!name.trim().length || !description.trim().length) {
         Alert.alert("Ошибка", "Вы ввели не все данные");
       } else {
         setData((prev) => [
@@ -67,31 +68,28 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.form}>
         <View style={styles.leftBlockForm}>
-          <View style={styles.leftBlockFormItem}>
-            <Text>Name:</Text>
-            <TextInput
-              onSubmitEditing={onSubmitEditingFirstInput}
-              style={styles.input}
-              value={name}
-              onChangeText={(value) => setName(value)}
-            />
-          </View>
-          <View style={styles.leftBlockFormItem}>
-            <Text>Descr:</Text>
-            <TextInput
-              ref={secondInputRef}
-              style={styles.input}
-              value={description}
-              onChangeText={(value) => setDescription(value)}
-            />
-          </View>
+          <Input
+            text="Name:"
+            onSubmitEditingFirstInput={onSubmitEditingFirstInput}
+            value={name}
+            setValue={setName}
+            inputRef={undefined}
+          />
+
+          <Input
+            text="Descr:"
+            onSubmitEditingFirstInput={undefined}
+            value={description}
+            setValue={setDescription}
+            inputRef={secondInputRef}
+          />
         </View>
         <TouchableOpacity onPress={addItem}>
           <Text style={styles.button}>Add</Text>
         </TouchableOpacity>
       </View>
       <FlatList
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString() + Math.random().toString()}
         data={data}
         renderItem={({ item }) => {
           return (
